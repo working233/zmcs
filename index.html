@@ -16,18 +16,18 @@
     <header class="header">
         <div class="container">
             <h1>⛏️ Minecraft 交易市场</h1>
-            <p class="subtitle">智能搜索 · 价格分析 · 数据可视化</p>
+            <p class="subtitle">智能搜索 · 价格分析 · 数据可视化 · 不法者悬赏</p>
         </div>
     </header>
 
     <!-- 主容器 -->
     <div class="container">
-        
+
         <!-- 过滤提示 -->
         <div id="filterNotice" style="display: none;" class="filter-notice">
             🔒 已自动过滤 <span id="filteredCount">0</span> 个保险柜价格（≥ $10,000,000）
         </div>
-        
+
         <!-- 统计卡片区域 -->
         <div class="stats-grid">
             <div class="stat-card">
@@ -58,13 +58,22 @@
                     <div class="stat-value" id="avgPrice">-</div>
                 </div>
             </div>
+            <!-- 新增悬赏统计卡片 -->
+            <div class="stat-card">
+                <div class="stat-icon">🚨</div>
+                <div class="stat-info">
+                    <div class="stat-label">当前悬赏数</div>
+                    <div class="stat-value" id="totalBounties">-</div>
+                </div>
+            </div>
         </div>
 
-        <!-- 标签页导航 -->
+        <!-- 新增：标签页导航添加悬赏模块 -->
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('market')">🛒 市场交易</button>
             <button class="tab-btn" onclick="switchTab('analysis')">📈 数据分析</button>
             <button class="tab-btn" onclick="switchTab('comparison')">🔍 价格对比</button>
+            <button class="tab-btn" onclick="switchTab('bounty')">🚨 不法者悬赏</button>
         </div>
 
         <!-- 市场交易标签页 -->
@@ -125,7 +134,7 @@
                     <canvas id="topPlayersChart"></canvas>
                 </div>
             </div>
-            
+
             <div class="analysis-grid">
                 <div class="chart-container">
                     <h3>💎 最贵物品 TOP 10</h3>
@@ -161,6 +170,108 @@
             </div>
         </div>
 
+        <!-- 新增：不法者悬赏标签页 -->
+        <div id="bounty-tab" class="tab-content">
+            <!-- 悬赏发布区域 -->
+            <div class="bounty-publish-section">
+                <h3>🚨 发布不法者悬赏</h3>
+                <p class="hint">举报游戏内诈骗、作弊、恶意骚扰等不法行为，设置赏金寻求线索或制裁</p>
+                <div class="publish-form-grid">
+                    <div class="form-item">
+                        <label>不法者ID：</label>
+                        <input type="text" id="criminalId" placeholder="输入涉嫌违规的玩家ID" required>
+                    </div>
+                    <div class="form-item">
+                        <label>违规类型：</label>
+                        <select id="crimeType" required>
+                            <option value="">选择违规类型</option>
+                            <option value="scam">交易诈骗</option>
+                            <option value="cheat">游戏作弊</option>
+                            <option value="harass">恶意骚扰</option>
+                            <option value="grief">破坏建筑</option>
+                            <option value="other">其他违规</option>
+                        </select>
+                    </div>
+                    <div class="form-item">
+                        <label>悬赏金额：</label>
+                        <input type="number" id="bountyAmount" placeholder="设置悬赏奖励（游戏货币）" min="1" required>
+                    </div>
+                    <div class="form-item">
+                        <label>悬赏描述：</label>
+                        <textarea id="bountyDesc" placeholder="详细描述违规行为、时间、地点等线索（必填）" rows="3" required></textarea>
+                    </div>
+                    <div class="form-item">
+                        <label>联系人ID：</label>
+                        <input type="text" id="contactId" placeholder="你的游戏ID（便于提供线索者联系）" required>
+                    </div>
+                    <div class="form-item submit-item">
+                        <button class="btn btn-danger" onclick="publishBounty()">发布悬赏</button>
+                        <button class="btn btn-secondary" onclick="clearBountyForm()">清空</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 悬赏筛选区域 -->
+            <div class="filter-section bounty-filter">
+                <h3>🔍 悬赏筛选</h3>
+                <div class="filter-grid">
+                    <div class="filter-item">
+                        <label>违规类型：</label>
+                        <select id="bountyTypeFilter">
+                            <option value="all">全部类型</option>
+                            <option value="scam">交易诈骗</option>
+                            <option value="cheat">游戏作弊</option>
+                            <option value="harass">恶意骚扰</option>
+                            <option value="grief">破坏建筑</option>
+                            <option value="other">其他违规</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>悬赏金额：</label>
+                        <div class="price-range">
+                            <input type="number" id="minBounty" placeholder="最低金额">
+                            <span>-</span>
+                            <input type="number" id="maxBounty" placeholder="最高金额">
+                        </div>
+                    </div>
+                    <div class="filter-item">
+                        <label>搜索不法者：</label>
+                        <input type="text" id="criminalSearch" placeholder="输入玩家ID搜索">
+                    </div>
+                    <div class="filter-item">
+                        <button class="btn btn-primary" onclick="applyBountyFilters()">应用筛选</button>
+                        <button class="btn btn-secondary" onclick="resetBountyFilters()">重置</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 悬赏列表区域 -->
+            <div class="bounty-list-container">
+                <h3>📋 当前不法者悬赏列表</h3>
+                <div id="bountyEmptyState" class="empty-state" style="display: none;">
+                    <div class="empty-icon">🚨</div>
+                    <h4>暂无相关悬赏</h4>
+                    <p>可以发布第一个不法者悬赏，维护游戏环境！</p>
+                </div>
+                <table id="bountyTable" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>不法者ID</th>
+                            <th>违规类型</th>
+                            <th>悬赏金额</th>
+                            <th>发布者</th>
+                            <th>发布时间</th>
+                            <th>违规描述</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bountyTableBody">
+                        <!-- 悬赏数据将通过JS动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <!-- 页脚 -->
@@ -171,4 +282,3 @@
     <script src="app.js?v=2.1"></script>
 </body>
 </html>
-

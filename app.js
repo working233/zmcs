@@ -440,3 +440,26 @@ function searchItemForComparison() {
     resultsContainer.innerHTML = html;
 }
 
+// 悬赏模块核心数据
+let bountyData = [
+    // 初始示例数据
+    {
+        id: 1,
+        criminalId: "Cheater_666",
+        crimeType: "cheat",
+        crimeTypeText: "游戏作弊",
+        amount: 50000,
+        publisher: "MineMaster",
+        publishTime: "2024-11-20 14:30",
+        description: "该玩家在PVP服务器使用自动瞄准和穿墙作弊，多次破坏游戏公平性，提供有效证据或协助封禁者可获赏金"
+    },
+    {
+        id: 2,
+        criminalId: "Scammer_X",
+        crimeType: "scam",
+        crimeTypeText: "交易诈骗",
+        amount: 30000,
+        publisher: "TradeKing",
+        publishTime: "2024-11-18 09:15",
+        description: "以低价出售钻石套装为诱饵，收取游戏货币后拉黑失联，已有3名玩家被骗，寻找其账号信息或交易记录"
+    }
